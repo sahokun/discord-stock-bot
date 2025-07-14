@@ -33,10 +33,10 @@ def test_basic_functionality():
     test_stocks = [
         ("369A.T", "(株)エータイ", "jp"),
         ("^N225", "日経平均", "jp"),
-        ("SPY", "SPDR S&P 500 ETF", "us"),
+        ("^GSPC", "S&P 500", "us"),
     ]
 
-    success = False
+    success_count = 0
     for symbol, name, market in test_stocks:
         try:
             price = stock_api.get_stock_price(symbol, name, market)
@@ -45,14 +45,13 @@ def test_basic_functionality():
                 print(
                     f"✓ {price.name}: {currency}{price.price:.2f} ({price.change_percent:+.2f}%)"
                 )
-                success = True
-                break
+                success_count += 1
+            else:
+                print(f"✗ {symbol} ({name}): データなし")
         except Exception as e:
-            print(f"✗ {symbol} エラー: {e}")
-            continue
+            print(f"✗ {symbol} ({name}) エラー: {e}")
 
-    if not success:
-        print("✗ 全ての銘柄で株価取得に失敗")
+    print(f"\n結果: {success_count}/{len(test_stocks)} 銘柄で取得成功")
 
     print("\n=== 設定検証 ===")
     print(f"✓ 通知設定: {'有効' if config.notification.webhook_url else '無効'}")
