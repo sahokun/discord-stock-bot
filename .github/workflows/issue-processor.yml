@@ -8,6 +8,10 @@ jobs:
   process-stock-command:
     runs-on: ubuntu-latest
     if: contains(github.event.issue.labels.*.name, 'discord-command')
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     
     steps:
     - name: Checkout code
@@ -96,6 +100,10 @@ jobs:
         
         # Read the result
         cat /tmp/result.txt >> $GITHUB_OUTPUT
+        
+        # Set environment variables for next step
+        echo "SUCCESS=$(grep SUCCESS /tmp/result.txt | cut -d'=' -f2)" >> $GITHUB_ENV
+        echo "MESSAGE=$(grep MESSAGE /tmp/result.txt | cut -d'=' -f2)" >> $GITHUB_ENV
     
     - name: Process remove stock command
       if: steps.extract-command.outputs.ACTION == 'remove'
@@ -120,6 +128,10 @@ jobs:
         " > /tmp/result.txt
         
         cat /tmp/result.txt >> $GITHUB_OUTPUT
+        
+        # Set environment variables for next step
+        echo "SUCCESS=$(grep SUCCESS /tmp/result.txt | cut -d'=' -f2)" >> $GITHUB_ENV
+        echo "MESSAGE=$(grep MESSAGE /tmp/result.txt | cut -d'=' -f2)" >> $GITHUB_ENV
     
     - name: Process list stocks command
       if: steps.extract-command.outputs.ACTION == 'list'
@@ -163,6 +175,10 @@ jobs:
         " > /tmp/result.txt
         
         cat /tmp/result.txt >> $GITHUB_OUTPUT
+        
+        # Set environment variables for next step
+        echo "SUCCESS=$(grep SUCCESS /tmp/result.txt | cut -d'=' -f2)" >> $GITHUB_ENV
+        echo "MESSAGE=$(grep MESSAGE /tmp/result.txt | cut -d'=' -f2)" >> $GITHUB_ENV
     
     - name: Process clear stocks command
       if: steps.extract-command.outputs.ACTION == 'clear'
@@ -181,11 +197,30 @@ jobs:
         " > /tmp/result.txt
         
         cat /tmp/result.txt >> $GITHUB_OUTPUT
+        
+        # Set environment variables for next step
+        echo "SUCCESS=$(grep SUCCESS /tmp/result.txt | cut -d'=' -f2)" >> $GITHUB_ENV
+        echo "MESSAGE=$(grep MESSAGE /tmp/result.txt | cut -d'=' -f2)" >> $GITHUB_ENV
+    
+    - name: Commit stock changes
+      if: steps.extract-command.outputs.ACTION == 'add' || steps.extract-command.outputs.ACTION == 'remove' || steps.extract-command.outputs.ACTION == 'clear'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/stocks.json
+        git diff --staged --quiet || git commit -m "Update stocks.json via GitHub Actions
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+        git push
     
     - name: Send Discord notification
       if: steps.extract-command.outputs.ACTION != 'unknown'
       env:
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        SUCCESS: ${{ env.SUCCESS }}
+        MESSAGE: ${{ env.MESSAGE }}
       run: |
         if [ -n "$DISCORD_WEBHOOK_URL" ]; then
           python -c "
@@ -193,7 +228,7 @@ jobs:
           import json
           import os
           
-          webhook_url = '${{ secrets.DISCORD_WEBHOOK_URL }}'
+          webhook_url = os.getenv('DISCORD_WEBHOOK_URL')
           action = '${{ steps.extract-command.outputs.ACTION }}'
           success = os.getenv('SUCCESS', 'false')
           message = os.getenv('MESSAGE', '処理が完了しました')
@@ -220,6 +255,7 @@ jobs:
           
           payload = {'embeds': [embed]}
           response = requests.post(webhook_url, json=payload)
+          print(f'Discord notification sent: {response.status_code}')
           "
         fi
     
