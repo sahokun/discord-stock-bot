@@ -1,0 +1,29 @@
+{
+  "stocks": [
+    {
+      "symbol": "BTC-USD",
+      "name": "Bitcoin",
+      "market": "crypto"
+    },
+    {
+      "symbol": "369A.T",
+      "name": "(株)エータイ",
+      "market": "jp"
+    },
+    {
+      "symbol": "8136.T",
+      "name": "(株)サンリオ",
+      "market": "jp"
+    },
+    {
+      "symbol": "^N225",
+      "name": "日経平均",
+      "market": "jp"
+    },
+    {
+      "symbol": "GSPC",
+      "name": "S&P 500",
+      "market": "us"
+    }
+  ]
+}
