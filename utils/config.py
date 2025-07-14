@@ -50,21 +50,13 @@ class Config:
 
         # 日本株
         jp_stocks = [
-            ("7203.T", "トヨタ自動車", "jp"),
-            ("6758.T", "ソニーグループ", "jp"),
-            ("9984.T", "ソフトバンクグループ", "jp"),
+            ("369A.T", "(株)エータイ", "jp"),
             ("^N225", "日経平均", "jp"),
-            ("^TOPX", "TOPIX", "jp"),
         ]
 
         # 米国株
         us_stocks = [
-            ("AAPL", "Apple", "us"),
-            ("GOOGL", "Alphabet", "us"),
-            ("MSFT", "Microsoft", "us"),
-            ("TSLA", "Tesla", "us"),
-            ("^GSPC", "S&P 500", "us"),
-            ("^DJI", "ダウ平均", "us"),
+            ("GSPC", "S&P 500", "us"),
         ]
 
         # 暗号通貨
