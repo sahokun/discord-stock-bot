@@ -45,37 +45,45 @@ class Config:
         self.github_token = os.getenv("GITHUB_TOKEN", "")
 
     def _load_stock_config(self) -> List[StockConfig]:
-        """株式設定を読み込み"""
-        stocks = []
-
-        # 日本株
-        jp_stocks = [
-            ("369A.T", "(株)エータイ", "jp"),
-            ("^N225", "日経平均", "jp"),
-        ]
-
-        # 米国株
-        us_stocks = [
-            ("GSPC", "S&P 500", "us"),
-        ]
-
-        # 暗号通貨
-        crypto_stocks = [
-            ("BTC-USD", "Bitcoin", "crypto"),
-        ]
-
-        # 設定を統合
-        for symbol, name, market in jp_stocks + us_stocks + crypto_stocks:
-            stocks.append(
-                StockConfig(
+        """株式設定を読み込み（動的株式リスト対応）"""
+        from utils.stock_manager import StockManager
+        
+        try:
+            # 動的株式リストから読み込み
+            stock_manager = StockManager()
+            stock_entries = stock_manager.load_stocks()
+            
+            stocks = []
+            for entry in stock_entries:
+                stocks.append(StockConfig(
+                    symbol=entry.symbol,
+                    name=entry.name,
+                    market=entry.market,
+                    threshold=self.price_change_threshold,
+                ))
+            
+            return stocks
+            
+        except Exception:
+            # フォールバック: 静的な設定
+            stocks = []
+            fallback_stocks = [
+                ("^N225", "日経平均", "jp"),
+                ("369A.T", "(株)エータイ", "jp"),
+                ("8136.T", "(株)サンリオ", "jp"),
+                ("GSPC", "S&P 500", "us"),
+                ("BTC-USD", "Bitcoin", "crypto"),
+            ]
+            
+            for symbol, name, market in fallback_stocks:
+                stocks.append(StockConfig(
                     symbol=symbol,
                     name=name,
                     market=market,
                     threshold=self.price_change_threshold,
-                )
-            )
-
-        return stocks
+                ))
+            
+            return stocks
 
     def validate(self) -> bool:
         """設定の妥当性チェック"""
