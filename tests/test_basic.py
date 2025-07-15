@@ -34,6 +34,7 @@ def test_basic_functionality():
         ("369A.T", "(株)エータイ", "jp"),
         ("^N225", "日経平均", "jp"),
         ("^GSPC", "S&P 500", "us"),
+        ("USDJPY=X", "USD/JPY", "forex"),
     ]
 
     success_count = 0
@@ -41,10 +42,21 @@ def test_basic_functionality():
         try:
             price = stock_api.get_stock_price(symbol, name, market)
             if price:
-                currency = "¥" if market == "jp" else "$"
-                print(
-                    f"✓ {price.name}: {currency}{price.price:.2f} ({price.change_percent:+.2f}%)"
-                )
+                if market == "jp":
+                    currency = "¥"
+                elif market == "forex":
+                    currency = ""  # 為替レートには通貨記号を付けない
+                else:
+                    currency = "$"
+
+                if market == "forex":
+                    print(
+                        f"✓ {price.name}: {price.price:.2f} ({price.change_percent:+.2f}%)"
+                    )
+                else:
+                    print(
+                        f"✓ {price.name}: {currency}{price.price:.2f} ({price.change_percent:+.2f}%)"
+                    )
                 success_count += 1
             else:
                 print(f"✗ {symbol} ({name}): データなし")

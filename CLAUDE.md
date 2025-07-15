@@ -4,125 +4,103 @@
 
 ## プロジェクト概要
 
-これはDiscordボットプロジェクトです。現在のコードベースは、包括的なDockerとVS Code設定を持つ開発環境のスケルトンですが、実際のPythonソースコードは実装する必要があります。
+これは株価情報を通知するDiscordボットプロジェクトです。GitHub ActionsとDiscord Webhookを連携させて、株価監視・通知システムを実装しています。
 
-## 開発環境
+## 実装済み機能
 
-### コンテナ設定
+### 1. Discord Bot (`bot/discord_bot.py`)
+- Discord.pyベースのボット実装
+- 株価情報の定期通知機能
+- GitHub Actions向けの単発実行モード
 
-- **ベースイメージ**: Python 3.12.6-bookworm
-- **ユーザー**: 非特権ユーザー（UID/GID 1000）
-- **言語**: 日本語ロケール（ja_JP.UTF-8）
-- **仮想環境**: `/src/venv/`（初回実行時に自動作成）
+### 2. 株価API (`api/stock_api.py`)
+- yfinanceを使用した株価取得
+- 複数の株式銘柄に対応
+- エラーハンドリングとフォールバック機能
 
-### 開発開始
+### 3. コマンド処理 (`utils/discord_commands.py`)
+- Discordメッセージからコマンドを解析
+- GitHub Issue作成用のフォーマット機能
+- サポートコマンド: add-stock, remove-stock, list-stocks, clear-stocks
 
-```bash
-# 開発コンテナをビルドして起動
-docker-compose -f .devcontainer/development/docker-compose.yml up --build
+### 4. GitHub Actions統合
+- Discord Webhookからのコマンド受信
+- 自動的なGitHub Issue作成
+- 株価通知の定期実行
 
-# またはVS Code Dev Containers拡張機能を使用
-# VS Codeで開き、「コンテナで再開」を選択
-```
-
-### Python環境
-
-```bash
-# 仮想環境は初回コンテナ実行時に自動作成されます
-# 必要に応じて手動でアクティベート:
-source venv/bin/activate
-
-# 依存関係をインストール（requirements.txtが存在する場合）:
-pip install -r requirements.txt
-
-# pipをアップグレード:
-pip install --upgrade pip
-```
-
-## 一般的なコマンド
-
-### 開発
-
-```bash
-# Blackでコードをフォーマット
-black .
-
-# Flake8でリント
-flake8 . --ignore=E501,F401,F811,E203,W503,W504 --max-line-length=88
-
-# インポートをソート
-isort --profile black .
-
-# テストを実行
-pytest tests -s
-```
-
-
-## コードスタイル設定
-
-### Pythonフォーマット
-
-- **フォーマッター**: Black（行の長さ: 88）
-- **インポートソート**: isort with black profile
-- **リンティング**: Black互換性のための特定の無視設定を持つFlake8
-
-### VS Code設定
-
-- 保存時フォーマットが有効
-- 自動インポート整理
-- テスト用のPytest
-- Pylance言語サーバー
-
-## アーキテクチャ概要
-
-### 現在の状態
-
-プロジェクトには完全な開発環境が含まれていますが、ソースコードはありません。実装時は以下を考慮してください:
-
-1. **メインアプリケーション**: Discordボットの実装
-2. **データ処理**: 必要に応じたデータ処理モジュール
-3. **外部API統合**: 各種APIとの統合
-4. **ユーティリティ**: 共通機能の実装
-
-### 期待される構造
+## アーキテクチャ
 
 ```text
 src/
-├── bot/              # Discord bot実装
-├── data/            # データ処理モジュール
-├── api/             # 外部API統合
-├── utils/           # ユーティリティ関数
-├── tests/           # テストファイル
-├── requirements.txt # Python依存関係
-└── main.py         # メインアプリケーションエントリーポイント
+├── bot/
+│   └── discord_bot.py      # Discord Bot実装
+├── api/
+│   └── stock_api.py        # 株価API
+├── data/
+│   └── stocks.json         # 監視銘柄データ
+├── utils/
+│   ├── config.py           # 設定管理
+│   ├── discord_commands.py # コマンド解析
+│   └── stock_manager.py    # 株式管理
+├── tests/                  # テストファイル
+├── main.py                 # エントリーポイント
+└── requirements.txt        # 依存関係
 ```
+
+## 開発環境
+
+### 必要な依存関係
+```
+discord.py==2.3.2
+requests==2.31.0  
+python-dotenv==1.0.0
+yfinance==0.2.65
+schedule==1.2.0
+pytz==2024.2
+pytest==8.4.1
+black==25.1.0
+flake8==7.3.0
+isort==6.0.1
+```
+
+### 開発コマンド
+
+```bash
+# コードフォーマット
+black .
+isort --profile black .
+
+# リント
+flake8 . --ignore=E501,F401,F811,E203,W503,W504 --max-line-length=88
+
+# テスト実行
+pytest tests -s
+python run_tests.py
+
+# メインアプリケーション実行
+python main.py
+```
+
+### Docker開発環境
+
+```bash
+# 開発コンテナを起動
+docker-compose -f .devcontainer/development/docker-compose.yml up --build
+```
+
+- **ベースイメージ**: Python 3.12
+- **非特権ユーザー**: UID/GID 1000
+- **仮想環境**: `/src/venv/`（自動作成）
 
 ## 環境変数
 
-プロジェクトは`.env`で設定された環境変数を使用します:
-
+必要な環境変数:
+- `DISCORD_WEBHOOK_URL` - Discord Webhook URL（GitHub Actionsで設定）
 - `COMPOSE_PROJECT_NAME=discord-stock-bot`
 
-以下の追加環境変数が必要になる可能性があります:
+## GitHub Actions
 
-- Discordボットトークン
-- 外部API用のAPIキー
-- データベース設定
-
-## テスト
-
-- **フレームワーク**: pytest
-- **テスト発見**: `tests/`ディレクトリ
-- **実行コマンド**: `pytest tests -s`
-- **VS Code統合**: ワークスペースルートをPythonパスとしてpytest用に設定
-
-## コンテナ環境変数
-
-Dockerコンテナは以下を設定します:
-
-- `PYTHONUNBUFFERED=1` - 即座にstdout/stderrを出力
-- `PYTHONDONTWRITEBYTECODE=1` - .pycファイルを防止
-- `PYTHONDEVMODE=1` - 開発モードを有効化
-- `CHOKIDAR_USEPOLLING=true` - 開発用のファイル監視
-- `HOME=/home/user` - ユーザーホームディレクトリ
-- `TZ=Asia/Tokyo` - タイムゾーン設定
+### `discord-command-handler.yml`
+- Discord Webhookからのコマンド処理
+- GitHub Issue自動作成
+- 無効コマンドの通知

@@ -24,6 +24,11 @@
       "symbol": "^GSPC",
       "name": "S&P 500",
       "market": "us"
+    },
+    {
+      "symbol": "USDJPY=X",
+      "name": "USD/JPY",
+      "market": "forex"
     }
   ]
 }

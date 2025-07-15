@@ -203,6 +203,8 @@ class DiscordStockBot:
             return f"¥{price:,.0f}"
         elif market == "crypto":
             return f"${price:,.0f}"
+        elif market == "forex":
+            return f"{price:.2f}"
         else:
             return f"${price:.2f}"
 

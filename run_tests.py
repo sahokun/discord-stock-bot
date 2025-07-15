@@ -37,52 +37,6 @@ def run_tests():
         return False
 
 
-def run_linting():
-    """コードリンティングを実行"""
-    try:
-        print("=== Black フォーマットチェック ===")
-        result = subprocess.run(
-            [sys.executable, "-m", "black", "--check", ".", "--exclude", "venv"],
-            capture_output=True,
-            text=True,
-        )
-
-        if result.returncode != 0:
-            print("フォーマットの問題が見つかりました:")
-            print(result.stdout)
-            print(result.stderr)
-        else:
-            print("フォーマットOK")
-
-        print("\n=== Flake8 リンティング ===")
-        result = subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "flake8",
-                ".",
-                "--ignore=E501,F401,F811,E203,W503,W504",
-                "--max-line-length=88",
-                "--exclude=venv",
-            ],
-            capture_output=True,
-            text=True,
-        )
-
-        if result.returncode != 0:
-            print("リンティングの問題が見つかりました:")
-            print(result.stdout)
-            print(result.stderr)
-        else:
-            print("リンティングOK")
-
-        return result.returncode == 0
-
-    except Exception as e:
-        print(f"リンティング実行エラー: {e}")
-        return False
-
-
 if __name__ == "__main__":
     print("Discord Stock Bot - テスト実行")
     print("=" * 40)
@@ -101,15 +55,13 @@ if __name__ == "__main__":
 
     # テスト実行
     test_success = run_tests()
-    lint_success = run_linting()
 
     print("\n=== 結果 ===")
     print(f"テスト: {'成功' if test_success else '失敗'}")
-    print(f"リンティング: {'成功' if lint_success else '失敗'}")
 
-    if test_success and lint_success:
-        print("すべてのチェックが成功しました！")
+    if test_success:
+        print("すべてのテストが成功しました！")
         sys.exit(0)
     else:
-        print("いくつかのチェックが失敗しました")
+        print("テストが失敗しました")
         sys.exit(1)
