@@ -208,11 +208,14 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add data/stocks.json
-        git diff --staged --quiet || git commit -m "Update stocks.json via GitHub Actions
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>"
+        git diff --staged --quiet || git commit -m "$(cat <<'EOF'
+        Update stocks.json via GitHub Actions
+        
+        🤖 Generated with [Claude Code](https://claude.ai/code)
+        
+        Co-Authored-By: Claude <noreply@anthropic.com>
+        EOF
+        )"
         git push
     
     - name: Send Discord notification
@@ -247,7 +250,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
               'fields': [
                   {
                       'name': '実行コマンド',
-                      'value': f'\`{action}\`',
+                      'value': f'`{action}`',
                       'inline': True
                   }
               ]
