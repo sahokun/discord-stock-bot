@@ -127,6 +127,8 @@ python main.py
 
 ## 6. Webhook トリガー（外部連携）
 
+**注意: 現在外部システムとの連携は未実装のため、webhook-trigger.ymlは未使用です。**
+
 外部システムからのWebhookトリガーを設定する場合：
 
 1. GitHub Personal Access Token を作成

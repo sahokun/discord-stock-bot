@@ -4,58 +4,58 @@ on:
   workflow_dispatch:
     inputs:
       webhook_data:
-        description: 'Webhook payload data'
+        description: "Webhook payload data"
         required: false
         type: string
 
 jobs:
   webhook-handler:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    
-    - name: Process webhook
-      env:
-        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        python -c "
-        import json
-        import os
-        from api.stock_api import StockPriceAPI
-        from bot.discord_bot import DiscordStockBot
-        from utils.config import Config
-        
-        # 設定初期化
-        config = Config()
-        stock_api = StockPriceAPI(config)
-        bot = DiscordStockBot(config, stock_api)
-        
-        # Webhookデータを処理
-        webhook_data = '${{ github.event.inputs.webhook_data }}'
-        if webhook_data:
-            data = json.loads(webhook_data)
-            print(f'Webhook data received: {data}')
-        
-        # 価格アラートチェック実行
-        bot._check_price_alerts()
-        "
-    
-    - name: Trigger repository dispatch
-      if: success()
-      uses: peter-evans/repository-dispatch@v3
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        event-type: stock-update
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Process webhook
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python -c "
+          import json
+          import os
+          from api.stock_api import StockPriceAPI
+          from bot.discord_bot import DiscordStockBot
+          from utils.config import Config
+
+          # 設定初期化
+          config = Config()
+          stock_api = StockPriceAPI(config)
+          bot = DiscordStockBot(config, stock_api)
+
+          # Webhookデータを処理
+          webhook_data = '${{ github.event.inputs.webhook_data }}'
+          if webhook_data:
+              data = json.loads(webhook_data)
+              print(f'Webhook data received: {data}')
+
+          # 価格アラートチェック実行
+          bot._check_price_alerts()
+          "
+
+      - name: Trigger repository dispatch
+        if: success()
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: stock-update

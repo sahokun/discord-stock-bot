@@ -3,18 +3,18 @@ name: Discord Stock Bot
 on:
   schedule:
     # 平日 9:00 JST (00:00 UTC) - 市場開始前通知
-    - cron: '0 0 * * 1-5'
+    - cron: "0 0 * * 1-5"
     # 平日 15:30 JST (06:30 UTC) - 日本市場終了後通知
-    - cron: '30 6 * * 1-5'
+    - cron: "30 6 * * 1-5"
     # 平日 23:00 JST (14:00 UTC) - 米国市場終了後通知
-    - cron: '0 14 * * 1-5'
-  
+    - cron: "0 14 * * 1-5"
+
   workflow_dispatch:
     inputs:
       notification_type:
-        description: 'Notification Type'
+        description: "Notification Type"
         required: true
-        default: 'regular'
+        default: "regular"
         type: choice
         options:
           - regular
@@ -27,78 +27,78 @@ on:
 jobs:
   stock-notification:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
-    
-    - name: Cache pip dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    
-    - name: Run stock bot
-      env:
-        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        NOTIFICATION_INTERVAL: ${{ vars.NOTIFICATION_INTERVAL || '300' }}
-        PRICE_CHANGE_THRESHOLD: ${{ vars.PRICE_CHANGE_THRESHOLD || '5.0' }}
-        TIMEZONE: ${{ vars.TIMEZONE || 'Asia/Tokyo' }}
-      run: |
-        python main.py
-    
-    - name: Upload logs
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: bot-logs
-        path: bot.log
-        retention-days: 7
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run stock bot
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          NOTIFICATION_INTERVAL: ${{ vars.NOTIFICATION_INTERVAL || '300' }}
+          PRICE_CHANGE_THRESHOLD: ${{ vars.PRICE_CHANGE_THRESHOLD || '5.0' }}
+          TIMEZONE: ${{ vars.TIMEZONE || 'Asia/Tokyo' }}
+        run: |
+          python main.py
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-logs
+          path: bot.log
+          retention-days: 7
 
   price-alert:
     runs-on: ubuntu-latest
     if: github.event.action == 'stock-update' || github.event.inputs.notification_type == 'alert'
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    
-    - name: Check price alerts
-      env:
-        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        PRICE_CHANGE_THRESHOLD: ${{ vars.PRICE_CHANGE_THRESHOLD || '5.0' }}
-      run: |
-        python -c "
-        from api.stock_api import StockPriceAPI
-        from bot.discord_bot import DiscordStockBot
-        from utils.config import Config
-        
-        config = Config()
-        stock_api = StockPriceAPI(config)
-        bot = DiscordStockBot(config, stock_api)
-        
-        # 価格アラートのみチェック
-        bot._check_price_alerts()
-        "
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check price alerts
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          PRICE_CHANGE_THRESHOLD: ${{ vars.PRICE_CHANGE_THRESHOLD || '5.0' }}
+        run: |
+          python -c "
+          from api.stock_api import StockPriceAPI
+          from bot.discord_bot import DiscordStockBot
+          from utils.config import Config
+
+          config = Config()
+          stock_api = StockPriceAPI(config)
+          bot = DiscordStockBot(config, stock_api)
+
+          # 価格アラートのみチェック
+          bot._check_price_alerts()
+          "
