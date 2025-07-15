@@ -21,7 +21,7 @@
       "market": "jp"
     },
     {
-      "symbol": "GSPC",
+      "symbol": "^GSPC",
       "name": "S&P 500",
       "market": "us"
     }
