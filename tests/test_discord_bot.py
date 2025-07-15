@@ -37,6 +37,11 @@ class TestDiscordStockBot(unittest.TestCase):
         result = self.bot._format_price(50000.0, "crypto")
         self.assertEqual(result, "$50,000")
 
+    def test_format_price_forex(self):
+        """為替レート価格フォーマットテスト"""
+        result = self.bot._format_price(148.85, "forex")
+        self.assertEqual(result, "148.85")
+
     def test_should_send_alert_first_time(self):
         """初回アラート送信判定テスト"""
         alert = StockPrice(
@@ -117,12 +122,23 @@ class TestDiscordStockBot(unittest.TestCase):
                 timestamp=datetime.now(),
                 market="us",
             ),
+            StockPrice(
+                symbol="USDJPY=X",
+                name="USD/JPY",
+                price=148.85,
+                change=1.56,
+                change_percent=1.06,
+                volume=0,
+                timestamp=datetime.now(),
+                market="forex",
+            ),
         ]
 
         result = self.bot._format_stock_list(stocks)
 
         self.assertIn("📈 **Test Stock 1**: $100.00 (+5.00%)", result)
         self.assertIn("📉 **Test Stock 2**: $200.00 (-5.00%)", result)
+        self.assertIn("📈 **USD/JPY**: 148.85 (+1.06%)", result)
 
 
 if __name__ == "__main__":
