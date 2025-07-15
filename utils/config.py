@@ -71,8 +71,6 @@ class Config:
             stocks = []
             fallback_stocks = [
                 ("^N225", "日経平均", "jp"),
-                ("369A.T", "(株)エータイ", "jp"),
-                ("8136.T", "(株)サンリオ", "jp"),
                 ("^GSPC", "S&P 500", "us"),
                 ("BTC-USD", "Bitcoin", "crypto"),
             ]
