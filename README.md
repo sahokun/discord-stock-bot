@@ -47,8 +47,10 @@
 ```
 ./
 ├── .github/workflows/          # GitHub Actions設定
+│   ├── ci.yml
 │   ├── discord-command-handler.yml
 │   ├── issue-processor.yml
+│   ├── webhook-trigger.yml
 │   └── stock-bot.yml
 ├── api/                       # 外部API連携
 │   └── stock_api.py
