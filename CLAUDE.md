@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-このファイルは、このリポジトリのコードを操作する際にClaude Code (claude.ai/code)にガイダンスを提供します。
-
 ## プロジェクト概要
 
 これは株価情報を通知するDiscordボットプロジェクトです。GitHub ActionsとDiscord Webhookを連携させて、株価監視・通知システムを実装しています。
@@ -11,12 +9,10 @@
 ### 1. Discord Bot (`bot/discord_bot.py`)
 - Discord.pyベースのボット実装
 - 株価情報の定期通知機能
-- GitHub Actions向けの単発実行モード
 
 ### 2. 株価API (`api/stock_api.py`)
 - yfinanceを使用した株価取得
 - 複数の株式銘柄に対応
-- エラーハンドリングとフォールバック機能
 
 ### 3. コマンド処理 (`utils/discord_commands.py`)
 - Discordメッセージからコマンドを解析
@@ -49,20 +45,6 @@ src/
 
 ## 開発環境
 
-### 必要な依存関係
-```
-discord.py==2.3.2
-requests==2.31.0  
-python-dotenv==1.0.0
-yfinance==0.2.65
-schedule==1.2.0
-pytz==2024.2
-pytest==8.4.1
-black==25.1.0
-flake8==7.3.0
-isort==6.0.1
-```
-
 ### 開発コマンド
 
 ```bash
@@ -88,10 +70,6 @@ python main.py
 docker-compose -f .devcontainer/development/docker-compose.yml up --build
 ```
 
-- **ベースイメージ**: Python 3.12
-- **非特権ユーザー**: UID/GID 1000
-- **仮想環境**: `/src/venv/`（自動作成）
-
 ## 環境変数
 
 必要な環境変数:
@@ -104,3 +82,14 @@ docker-compose -f .devcontainer/development/docker-compose.yml up --build
 - Discord Webhookからのコマンド処理
 - GitHub Issue自動作成
 - 無効コマンドの通知
+
+## Git ワークフロー
+
+- featureブランチは `feature/<name>` の形式で **mainから** 作成する
+- mainへの直接push・force pushは禁止
+- Claudeの作業範囲はfeatureブランチへのpushまで
+
+### PRフロー（人間が担当）
+- PR作成・マージは人間が行う
+- Copilotの自動レビューでコメントが付いた場合、Claudeが修正して同じfeatureブランチにpushする
+- スレッドのResolveと最終マージは人間が行う

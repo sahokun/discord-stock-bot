@@ -57,8 +57,6 @@ src/
 │   ├── config.py
 │   ├── discord_commands.py
 │   └── stock_manager.py
-├── DISCORD_SETUP.md          # 利用ガイド
-├── DISCORD_COMMANDS.md       # コマンドリファレンス
 └── requirements.txt          # 依存関係
 ```
 
@@ -77,26 +75,32 @@ src/
 1. GitHub Actionsページで手動実行
 2. または GitHub Issuesで直接管理
 
-## 💰 コスト
+## 🏗️ アーキテクチャ：GitHub Issueをメッセージキューとして使う設計
 
-- **GitHub Actions**: 月2,000分無料
-- **GitHub Issues**: 無制限無料  
-- **Discord Webhook**: 完全無料
-- **株価API**: Yahoo Finance（無料）
+このプロジェクトはGitHub Issueを**コマンドの中継地点（メッセージキュー）**として活用しています。
 
-**完全無料で運用可能！**
+### コマンド処理の流れ
 
-## 📚 ドキュメント
+```
+Discord (ユーザーがコマンド入力)
+    ↓ !add-stock AAPL Apple us
+discord-command-handler.yml (workflow_dispatch でトリガー)
+    ↓ コマンドを解析してGitHub Issueを自動作成
+    例) タイトル: "Add Stock: AAPL (Apple)"
+         ラベル: "discord-command"
+issue-processor.yml (issues: opened でトリガー)
+    ↓ discord-command ラベル付きIssueを検知
+    ↓ IssueのタイトルとBODYからコマンドを再解析
+stocks.json を更新 → Discord に結果を通知
+```
 
-- [利用ガイド](DISCORD_SETUP.md) - 詳細な設定・使用方法
-- [コマンドリファレンス](DISCORD_COMMANDS.md) - 全コマンドの詳細
-- [開発者向け情報](CLAUDE.md) - プロジェクト構成とコード規約
+### 関連ファイル
 
-## 🔒 セキュリティ
+- [`.github/workflows/discord-command-handler.yml`](.github/workflows/discord-command-handler.yml) - Discordコマンドを受け取りIssueを作成
+- [`.github/workflows/issue-processor.yml`](.github/workflows/issue-processor.yml) - Issueを検知して実際の処理を実行
+- [`utils/discord_commands.py`](utils/discord_commands.py) - コマンド解析とIssueフォーマット生成
 
-- GitHubの高セキュリティ環境で動作
-- APIキーはGitHub Secretsで管理
-- 全ての操作がGitHubに記録
+---
 
 ## 📈 使用例
 
@@ -113,18 +117,3 @@ src/
 # 銘柄一覧表示
 !list-stocks
 ```
-
-## 🤝 貢献
-
-1. リポジトリをフォーク
-2. 機能ブランチを作成
-3. 変更をコミット
-4. プルリクエストを送信
-
-## 📄 ライセンス
-
-このプロジェクトはMITライセンスの下で公開されています。
-
----
-
-**完全サーバー不要で株価管理！GitHub Actionsの力を活用した現代的なソリューションです。**
