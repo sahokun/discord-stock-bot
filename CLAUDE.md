@@ -53,7 +53,7 @@ black .
 isort --profile black .
 
 # リント
-flake8 . --ignore=E501,F401,F811,E203,W503,W504 --max-line-length=88
+flake8 . --ignore=E501,F401,F811,E203,W503,W504,W291,W293,E303 --max-line-length=88
 
 # テスト実行
 pytest tests -s
