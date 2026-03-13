@@ -48,19 +48,27 @@
 ### 開発コマンド
 
 ```bash
+# uvのインストール（初回のみ）
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Python 3.12 のインストール＋venv作成＋依存関係インストール
+uv python install 3.12
+uv venv
+uv pip install -r requirements.txt
+
 # コードフォーマット
-black .
-isort --profile black .
+uv run black .
+uv run isort --profile black .
 
 # リント
-flake8 . --ignore=E501,F401,F811,E203,W503,W504,W291,W293,E303 --max-line-length=88
+uv run flake8 . --ignore=E501,F401,F541,F811,E203,W503,W504 --max-line-length=88
 
 # テスト実行
-pytest tests -s
-python run_tests.py
+uv run pytest tests -s
+uv run python run_tests.py
 
 # メインアプリケーション実行
-python main.py
+uv run python main.py
 ```
 
 ### GitHub CLI (gh)
@@ -81,16 +89,12 @@ gh pr create --title "タイトル" --body "説明"
 
 ### Docker開発環境
 
-```bash
-# 開発コンテナを起動
-docker-compose -f .devcontainer/development/docker-compose.yml up --build
-```
+Dockerコンテナ開発環境は廃止しました。uvを使ってWSLローカル環境で直接開発してください。
 
 ## 環境変数
 
 必要な環境変数:
 - `DISCORD_WEBHOOK_URL` - Discord Webhook URL（GitHub Actionsで設定）
-- `COMPOSE_PROJECT_NAME=discord-stock-bot`
 
 ## GitHub Actions
 
