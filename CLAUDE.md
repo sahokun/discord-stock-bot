@@ -27,7 +27,7 @@
 ## アーキテクチャ
 
 ```text
-src/
+./
 ├── bot/
 │   └── discord_bot.py      # Discord Bot実装
 ├── api/
@@ -61,6 +61,22 @@ python run_tests.py
 
 # メインアプリケーション実行
 python main.py
+```
+
+### GitHub CLI (gh)
+
+```bash
+# PR一覧
+gh pr list
+
+# PR詳細確認
+gh pr view <番号>
+
+# PRをクローズ
+gh pr close <番号>
+
+# PR作成
+gh pr create --title "タイトル" --body "説明"
 ```
 
 ### Docker開発環境

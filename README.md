@@ -42,7 +42,7 @@
 ## 📁 ファイル構成
 
 ```
-src/
+./
 ├── .github/workflows/          # GitHub Actions設定
 │   ├── discord-command-handler.yml
 │   ├── issue-processor.yml
