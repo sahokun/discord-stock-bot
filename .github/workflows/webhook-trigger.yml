@@ -55,7 +55,13 @@ jobs:
 
       - name: Trigger repository dispatch
         if: success()
-        uses: peter-evans/repository-dispatch@v3
+        uses: actions/github-script@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          event-type: stock-update
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createDispatchEvent({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              event_type: 'stock-update',
+              client_payload: {}
+            });
