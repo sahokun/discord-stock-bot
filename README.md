@@ -14,17 +14,20 @@
 ## 📋 主な機能
 
 ### 1. 株式管理
+
 - **株式追加**: `!add-stock AAPL Apple us`
 - **株式削除**: `!remove-stock AAPL`
 - **銘柄一覧**: `!list-stocks`
 - **全削除**: `!clear-stocks`
 
 ### 2. 株価通知
+
 - **定期通知**: 指定時間に株価を自動通知
 - **価格アラート**: 急激な価格変動を検知
 - **市場別表示**: 日本株、米国株、暗号通貨を分類
 
 ### 3. 利用方法
+
 - **GitHub Actions手動実行**: WebブラウザからGitHub上で実行
 - **GitHub Issues作成**: Issue経由でコマンド実行
 - **Discord Webhook**: 結果をDiscordに自動通知
@@ -63,15 +66,18 @@
 ## 🔧 セットアップ
 
 ### 1. Discord Webhook設定
+
 1. Discord サーバーでWebhookを作成
 2. GitHub SecretsにWebhook URLを設定
 
 ### 2. GitHub Actions設定
+
 1. リポジトリをフォーク
 2. GitHub Actionsを有効化
 3. 必要に応じてcron設定を調整
 
 ### 3. 使用開始
+
 1. GitHub Actionsページで手動実行
 2. または GitHub Issuesで直接管理
 
@@ -88,7 +94,7 @@ discord-command-handler.yml (workflow_dispatch でトリガー)
     ↓ コマンドを解析してGitHub Issueを自動作成
     例) タイトル: "Add Stock: AAPL (Apple)"
          ラベル: "discord-command"
-issue-processor.yml (issues: opened でトリガー)
+issue-processor.yml (issues: opened, edited でトリガー)
     ↓ discord-command ラベル付きIssueを検知
     ↓ IssueのタイトルとBODYからコマンドを再解析
 stocks.json を更新 → Discord に結果を通知
